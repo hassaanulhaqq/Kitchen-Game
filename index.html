@@ -3,115 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ننھے شیف - لائیو کینوس گیم</title>
-    <!-- Phaser 3 گیم انجن CDN -->
+    <title>ننھے شیف - لائیو کوکنگ گیم</title>
+    <!-- Phaser 3 فریم ورک CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #090d16;
+            background: #05050a;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
-        #game-canvas-container {
-            border: 6px solid #f59e0b;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
-            overflow: hidden;
+        #game-container {
+            border: 5px solid #ffaa00;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(255, 170, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <!-- یہاں اصل گیم کا کینوس رینڈر ہوگا -->
-    <div id="game-canvas-container"></div>
+    <!-- خالص گیم کینوس ہولڈر -->
+    <div id="game-container"></div>
 
     <script>
-        class MainGameScene extends Phaser.Scene {
+        class CookingGameScene extends Phaser.Scene {
             constructor() {
-                super('MainGameScene');
-            }
-
-            preload() {
-                // یہاں گیم کے گرافکس اور اثاثے لوڈ ہوتے ہیں
+                super('CookingGameScene');
             }
 
             create() {
-                // 1. کینوس پر کچن کا لائیو پس منظر (WebGL / Canvas Background)
-                this.add.rectangle(640, 360, 1280, 720, 0x1e293b);
+                // 1. کینوس کا پس منظر (گیم کا اپنا ماحول)
+                this.add.rectangle(640, 360, 1280, 720, 0x111827);
 
-                // کاؤنٹر ٹاپ کی لکیر
-                this.add.rectangle(640, 550, 1280, 340, 0x334155);
-                this.add.rectangle(640, 390, 1280, 20, 0xf59e0b);
+                // 2. کچن کاؤنٹر (کینوس گرافکس)
+                this.add.rectangle(640, 580, 1200, 240, 0x1f2937).setStrokeStyle(4, 0x374151);
+                this.add.rectangle(640, 460, 1200, 12, 0xf59e0b);
 
-                // 2. ٹاپ ہیڈر اور اسکور بورڈ
-                this.add.text(640, 50, '🍳 ننھے شیف - فُل کینوس سمولیشن گیم 🍲', {
-                    fontSize: '36px',
+                // 3. گیم کا ٹاپ ہیڈر اور اسکور
+                this.add.text(640, 45, '🍳 ننھے شیف - لائیو کچن سمیولیشن 🍲', {
+                    fontSize: '32px',
                     fill: '#f59e0b',
-                    fontStyle: 'bold'
+                    fontStyle: 'bold',
+                    fontFamily: 'Segoe UI'
                 }).setOrigin(0.5);
 
-                this.scoreText = this.add.text(1150, 50, 'اسکور: 0', {
-                    fontSize: '28px',
+                this.score = 40;
+                this.scoreText = this.add.text(1150, 45, 'اسکور: ' + this.score, {
+                    fontSize: '24px',
                     fill: '#ffffff',
                     backgroundColor: '#d97706',
-                    padding: { x: 15, y: 8 }
+                    padding: { x: 12, y: 6 }
                 }).setOrigin(0.5);
 
-                // 3. وائس اوور / ڈائیلاگ باکس (گیم کے اندر رینڈر شدہ گرافیکل باکس)
-                this.add.rectangle(640, 130, 950, 60, 0xffffff, 0.95).setStrokeStyle(4, 0xf59e0b);
-                
-                this.dialogueText = this.add.text(640, 130, 'السَّلَامُ عَلَيْكُمْ دوستو! آج مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!', {
-                    fontSize: '24px',
-                    fill: '#0f172a',
+                // 4. گیم کے اندر ہی گرافیکل ڈائیلاگ باکس (وائس اوور بار)
+                this.add.rectangle(640, 120, 900, 60, 0xffffff, 0.95).setStrokeStyle(3, 0xf59e0b);
+                this.instructionText = this.add.text(640, 120, 'بہت زبردست! تمام اجزاء مکس ہو گئے ہیں۔ اب چولہا جلائیں۔', {
+                    fontSize: '22px',
+                    fill: '#1f2937',
                     fontStyle: 'bold'
                 }).setOrigin(0.5);
 
-                // سلام عربی لہجے میں پلے کرنا
-                this.playVoice("السَّلَامُ عَلَيْكُمْ دوستو! آج مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!", true);
+                // 5. مکسنگ پیالہ اور چولہا (گیم ابجیکٹس)
+                let bowl = this.add.text(350, 520, '🥣 پیالہ', { 
+                    fontSize: '28px', fill: '#ffffff', backgroundColor: '#3b82f6', padding: { x: 20, y: 12 } 
+                }).setOrigin(0.5).setInteractive();
 
-                // 4. گیم کے مرکزی اسٹیشنز (مکسنگ پیالہ اور چولہا)
-                let bowl = this.add.text(400, 480, '🥣', { fontSize: '80px' }).setOrigin(0.5).setInteractive();
-                this.add.text(400, 550, 'مکسنگ پیالہ', { fontSize: '20px', fill: '#38bdf8' }).setOrigin(0.5);
+                let stove = this.add.text(930, 520, '🔥 چولہا (Stove)', { 
+                    fontSize: '28px', fill: '#ffffff', backgroundColor: '#ef4444', padding: { x: 20, y: 12 } 
+                }).setOrigin(0.5).setInteractive();
 
-                let stove = this.add.text(880, 480, '🔥', { fontSize: '80px' }).setOrigin(0.5).setInteractive();
-                this.add.text(880, 550, 'چولہا (Stove)', { fontSize: '20px', fill: '#f43f5e' }).setOrigin(0.5);
+                // 6. شیلف کے اجزاء
+                this.createIngredient(300, 250, '🌾', 'میدہ');
+                this.createIngredient(500, 250, '🥚', 'انڈا');
+                this.createIngredient(700, 250, '🥛', 'دودھ');
+                this.createIngredient(900, 250, '🍯', 'شہد');
 
-                // 5. شیلف پر اجزاء (میدہ، انڈا، دودھ، شہد)
-                let flour = this.createItem(250, 250, '🌾', 'میدہ');
-                let egg = this.createItem(450, 250, '🥚', 'انڈا');
-                let milk = this.createItem(650, 250, '🥛', 'دودھ');
-                let honey = this.createItem(850, 250, '🍯', 'شہد');
-
-                // اسکور کی ویری ایبل
-                this.score = 0;
-
-                // مکسنگ باؤل پر کلک کرنے کی منطق
-                bowl.on('pointerdown', () => {
-                    this.score += 15;
-                    this.scoreText.setText('اسکور: ' + this.score);
-                    this.dialogueText.setText('بہت زبردست! تمام اجزاء مکس ہو گئے ہیں۔ اب چولہا جلائیں۔');
-                    this.playVoice("بہت زبردست! اجزاء مکس ہو گئے ہیں۔");
-                });
-
-                // چولہے پر کلک کرنے کی منطق
+                // باؤل یا چولہے پر کلک کرنے پر ایکشن
                 stove.on('pointerdown', () => {
                     this.score += 25;
                     this.scoreText.setText('اسکور: ' + this.score);
-                    this.dialogueText.setText('مَا شَاءَ اللّٰه! گرما گرم پین کیک تیار ہو چکا ہے!');
-                    this.playVoice("مَا شَاءَ اللّٰه! پین کیک تیار ہو گیا ہے!", true);
+                    this.instructionText.setText('مَا شَاءَ اللّٰه! گرما گرم پین کیک تیار ہو چکا ہے!');
+                    this.speakVoice("مَا شَاءَ اللّٰه! پین کیک تیار ہو گیا ہے!", true);
                 });
             }
 
-            createItem(x, y, emoji, name) {
-                let item = this.add.text(x, y, emoji, { fontSize: '50px' }).setOrigin(0.5).setInteractive();
+            createIngredient(x, y, emoji, name) {
+                let item = this.add.text(x, y, emoji, { fontSize: '55px' }).setOrigin(0.5).setInteractive();
                 
-                // کینوس پر ڈریگ اینڈ ڈراپ کا بلٹ ان فزکس فلو
+                // فزکس اور ڈریگ سسٹم
                 this.input.setDraggable(item);
 
                 this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
@@ -120,14 +103,12 @@
                 });
 
                 item.on('pointerdown', () => {
-                    this.dialogueText.setText(`آپ نے ${name} منتخب کیا ہے! اسے پیالے میں ڈالیں۔`);
-                    this.playVoice(`${name} اٹھا لیا ہے، اب پیالے میں ڈالیں۔`);
+                    this.instructionText.setText(`آپ نے ${name} اٹھا لیا ہے!`);
+                    this.speakVoice(`${name} اٹھا لیا ہے۔`);
                 });
-
-                return item;
             }
 
-            playVoice(text, isArabic = false) {
+            speakVoice(text, isArabic = false) {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     let utterance = new SpeechSynthesisUtterance(text);
@@ -138,14 +119,13 @@
             }
         }
 
-        // Phaser گیم کی کنفیگریشن (خالص کینوس موڈ)
         const config = {
             type: Phaser.AUTO,
             width: 1280,
             height: 720,
-            parent: 'game-canvas-container',
-            backgroundColor: '#0f172a',
-            scene: [MainGameScene]
+            parent: 'game-container',
+            backgroundColor: '#05050a',
+            scene: [CookingGameScene]
         };
 
         const game = new Phaser.Game(config);
