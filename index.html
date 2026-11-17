@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ننھے شیف - لائیو کوکنگ سمولیشن گیم</title>
+    <title>ننھے شیف - لائیو سمیولیشن گیم</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,247 +12,270 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: #0f172a;
             color: #fff;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             overflow: hidden;
-            padding: 10px;
         }
-        header {
-            background: rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 900px;
-            padding: 10px 20px;
-            border-radius: 15px;
+        /* گیم کا مین کنٹینر (WebGL ونڈو فریم) */
+        .game-viewport {
+            position: relative;
+            width: 1000px;
+            height: 600px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 6px solid #f59e0b;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            overflow: hidden;
+        }
+        /* ٹاپ ہیڈر */
+        .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-bottom: 3px solid #f1c40f;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border-bottom: 2px solid #f59e0b;
         }
-        h1 {
-            font-size: 1.6rem;
-            color: #f1c40f;
-        }
-        .score-badge {
-            background: #e67e22;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 1.1rem;
+        .game-title {
+            font-size: 1.5rem;
+            color: #f59e0b;
             font-weight: bold;
         }
-        /* ڈائیلاگ باکس */
-        .dialogue-box {
-            background: rgba(255, 255, 255, 0.95);
-            color: #2c3e50;
+        .score-box {
+            background: #d97706;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        /* ڈائیلاگ اور وائس اوور بار */
+        .voice-bar {
+            background: #ffffff;
+            color: #1e293b;
             padding: 12px 20px;
             border-radius: 30px;
             font-size: 1.2rem;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 900px;
-            text-align: center;
-        }
-        /* کچن روم انوائرمنٹ */
-        .kitchen-room {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            height: 380px;
-            background: linear-gradient(to bottom, #ecf0f1, #bdc3c7);
-            border: 6px solid #34495e;
-            border-radius: 20px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.2), 0 10px 25px rgba(0,0,0,0.4);
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 15px;
-        }
-        /* شیلف جہاں اجزاء رکھے ہیں */
-        .shelf {
-            display: flex;
-            justify-content: space-around;
-            background: #d35400;
-            padding: 8px;
-            border-radius: 10px;
-            border-bottom: 4px solid #962d00;
-        }
-        .ingredient {
-            font-size: 2.8rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-            user-select: none;
-        }
-        .ingredient:hover {
-            transform: scale(1.2);
-        }
-        /* ورک área (باؤل اور چولہا) */
-        .workspace {
-            display: flex;
-            justify-content: space-around;
             align-items: center;
-            height: 180px;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
         }
-        .station {
-            width: 160px;
-            height: 130px;
-            background: #34495e;
-            border: 4px solid #f1c40f;
+        /* کچن گراؤنڈ */
+        .kitchen-stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        /* شیلف اور اسٹیشنز */
+        .shelf-container {
+            display: flex;
+            gap: 15px;
+            background: #b45309;
+            padding: 10px 20px;
+            border-radius: 15px;
+            border-bottom: 4px solid #78350f;
+        }
+        .item-card {
+            background: #fff;
+            color: #000;
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: grab;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .item-card:hover {
+            transform: scale(1.1);
+        }
+        .workstation {
+            width: 220px;
+            height: 200px;
+            background: #334155;
+            border: 4px solid #38bdf8;
             border-radius: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
             transition: all 0.3s;
         }
-        .station:hover {
-            background: #2c3e50;
-            transform: translateY(-3px);
+        .workstation:hover {
+            border-color: #f59e0b;
         }
-        .station span {
-            font-size: 2.5rem;
+        .workstation span {
+            font-size: 4rem;
         }
-        .station label {
-            font-size: 0.9rem;
-            color: #f1c40f;
-            margin-top: 5px;
+        .workstation label {
+            margin-top: 10px;
             font-weight: bold;
+            color: #38bdf8;
         }
-        /* کنٹرول بٹنز */
-        .controls {
+        /* کنٹرول بار */
+        .footer-controls {
             display: flex;
+            justify-content: center;
             gap: 15px;
-            margin-bottom: 10px;
         }
-        .btn {
-            background: #27ae60;
+        .action-btn {
+            background: #10b981;
             color: white;
             border: none;
             padding: 10px 25px;
             font-size: 1.1rem;
+            font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-weight: bold;
             transition: background 0.2s;
         }
-        .btn:hover {
-            background: #219653;
+        .action-btn:hover {
+            background: #059669;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🍳 ننھے شیف - لائیو سمولیشن</h1>
-        <div class="score-badge" id="score">اسکور: 0</div>
-    </header>
-
-    <!-- وائس اوور اور ہدایت باکس -->
-    <div class="dialogue-box" id="instructionBox">
-        🔊 <span id="instructionText">السَّلَامُ عَلَيْكُمْ دوستو! آج ہمارے کچن میں مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!</span>
-    </div>
-
-    <!-- کچن روم -->
-    <div class="kitchen-room">
-        <!-- اوپر اجزاء کی شیلف -->
-        <div class="shelf">
-            <div class="ingredient" onclick="selectItem('🌾', 'میدہ')">🌾</div>
-            <div class="ingredient" onclick="selectItem('🥚', 'انڈا')">🥚</div>
-            <div class="ingredient" onclick="selectItem('🥛', 'دودھ')">🥛</div>
-            <div class="ingredient" onclick="selectItem('🍯', 'شہد')">🍯</div>
+    <div class="game-viewport">
+        <!-- ہیڈر -->
+        <div class="game-header">
+            <div class="game-title">🍳 ننھے شیف - لائیو کچن سمیولیشن</div>
+            <div class="score-box" id="scoreDisplay">اسکور: 0</div>
         </div>
 
-        <!-- نیچے ورکنگ اسٹیشنز -->
-        <div class="workspace">
-            <div class="station" onclick="actionOnBowl()">
-                <span id="bowlIcon">🥣</span>
+        <!-- وائس اوور باکس (کلک کرنے پر دوبارہ آواز چلے گی) -->
+        <div class="voice-bar" onclick="replayVoice()">
+            🔊 <span id="voiceText">السَّلَامُ عَلَيْكُمْ دوستو! آج مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!</span>
+        </div>
+
+        <!-- کچن کا اسٹیج -->
+        <div class="kitchen-stage">
+            <!-- اجزاء کی شیلف -->
+            <div class="shelf-container">
+                <div class="item-card" onclick="pickItem('🌾', 'میدہ')">🌾</div>
+                <div class="item-card" onclick="pickItem('🥚', 'انڈا')">🥚</div>
+                <div class="item-card" onclick="pickItem('🥛', 'دودھ')">🥛</div>
+                <div class="item-card" onclick="pickItem('🍯', 'شہد')">🍯</div>
+            </div>
+
+            <!-- مکسنگ اور کوکنگ اسٹیشن -->
+            <div class="workstation" onclick="useBowl()" id="bowlStation">
+                <span id="bowlEmoji">🥣</span>
                 <label>مکسنگ پیالہ</label>
             </div>
-            <div class="station" onclick="actionOnStove()">
-                <span id="stoveIcon">🔥</span>
-                <label>چولہا (Stove)</label>
+
+            <div class="workstation" onclick="useStove()" id="stoveStation" style="border-color: #f43f5e;">
+                <span id="stoveEmoji">🔥</span>
+                <label style="color: #f43f5e;">چولہا (Stove)</label>
             </div>
         </div>
-    </div>
 
-    <div class="controls">
-        <button class="btn" onclick="resetGame()">دوبارہ شروع کریں 🔄</button>
-        <button class="btn" onclick="nextStepVoice()">اگلا سٹیپ ➡️</button>
+        <!-- فوٹر کنٹرولز -->
+        <div class="footer-controls">
+            <button class="action-btn" onclick="resetKitchen()">دوبارہ شروع کریں 🔄</button>
+            <button class="action-btn" style="background: #6366f1;" onclick="nextStep()">اگلا مرحلہ ➡️</button>
+        </div>
     </div>
 
     <script>
-        let currentScore = 0;
-        let selectedIngredient = null;
+        let score = 0;
+        let activeItem = null;
+        let currentDialogue = "السَّلَامُ عَلَيْكُمْ دوستو! آج مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!";
 
-        // عربی ایکسنٹ اور اردو وائس اوور فنکشن
-        function playVoice(text, isArabic = false) {
+        // بہتر اور معیاری آڈیو سنتھیسس (عربی اور اردو درست تلفظ کے ساتھ)
+        function speak(text, isArabic = false) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(text);
-                if (isArabic) {
-                    utterance.lang = 'ar-SA'; // خالص عربی لہجہ سلام اور ماشاءاللہ کے لیے
-                } else {
-                    utterance.lang = 'ur-PK'; // اردو لہجہ
-                }
-                utterance.rate = 0.9;
+                
+                // عربی اور اردو کے لیے درست زبان کا ٹیگ
+                utterance.lang = isArabic ? 'ar-SA' : 'ur-PK';
+                utterance.rate = 0.85; // ہلکی رفتار تاکہ بچوں کو سمجھ آئے
+                utterance.pitch = 1.1;  // دوستانہ اور خوشگوار آواز
+                
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // جب بچہ کسی جز (Ingredient) پر کلک کرے
-        function selectItem(emoji, name) {
-            selectedIngredient = emoji;
-            document.getElementById("instructionText").innerText = `آپ نے ${name} (${emoji}) اٹھایا ہے! اب اسے مکسنگ پیالے میں ڈالیں۔`;
-            playVoice(`${name} اٹھا لیا ہے، اب پیالے میں ڈالیں۔`);
+        function replayVoice() {
+            speak(currentDialogue, currentDialogue.includes('مَا شَاءَ اللّٰه'));
         }
 
-        // جب بچہ مکسنگ پیالے پر کلک کرے
-        function actionOnBowl() {
-            if (selectedIngredient) {
-                document.getElementById("bowlIcon").innerText = selectedIngredient;
-                currentScore += 10;
-                document.getElementById("score").innerText = "اسکور: " + currentScore;
-                document.getElementById("instructionText").innerText = "واہ! مکسچر تیار ہو رہا ہے، اب چولہے پر پکائیں۔";
-                playVoice("بہت اچھے! مکسچر میں شامل ہو گیا ہے۔");
-                selectedIngredient = null;
+        function pickItem(emoji, name) {
+            activeItem = emoji;
+            currentDialogue = `آپ نے ${name} اٹھا لیا ہے! اب اسے مکسنگ پیالے میں ڈالیں۔`;
+            document.getElementById("voiceText").innerText = currentDialogue;
+            speak(currentDialogue);
+        }
+
+        function useBowl() {
+            if (activeItem) {
+                document.getElementById("bowlEmoji").innerText = activeItem;
+                score += 15;
+                document.getElementById("scoreDisplay").innerText = "اسکور: " + score;
+                currentDialogue = "بہت زبردست! تمام اجزاء مکس ہو گئے ہیں۔ اب چولہا جلائیں۔";
+                document.getElementById("voiceText").innerText = currentDialogue;
+                speak("بہت زبردست! اجزاء مکس ہو گئے ہیں۔");
+                activeItem = null;
             } else {
-                playVoice("پہلے اوپر شیلف سے کوئی چیز اٹھائیں۔");
+                currentDialogue = "پہلے شیلف سے کوئی جز (میدہ یا انڈا) منتخب کریں۔";
+                document.getElementById("voiceText").innerText = currentDialogue;
+                speak("پہلے شیلف سے کوئی جز منتخب کریں۔");
             }
         }
 
-        // جب بچہ چولہے پر کلک کرے
-        function actionOnStove() {
-            currentScore += 20;
-            document.getElementById("score").innerText = "اسکور: " + currentScore;
-            document.getElementById("instructionText").innerText = "مَا شَاءَ اللّٰه! پین کیک بالکل تیار ہو چکا ہے، خوشبو بہت اچھی ہے!";
-            playVoice("مَا شَاءَ اللّٰه! پین کیک تیار ہو گیا ہے!", true);
+        function useStove() {
+            score += 25;
+            document.getElementById("scoreDisplay").innerText = "اسکور: " + score;
+            currentDialogue = "مَا شَاءَ اللّٰه! گرما گرم پین کیک تیار ہو چکا ہے! یمی!";
+            document.getElementById("voiceText").innerText = currentDialogue;
+            speak("مَا شَاءَ اللّٰه! پین کیک تیار ہو گیا ہے!", true);
         }
 
-        function nextStepVoice() {
-            playVoice("اگلا مرحلہ شروع کرتے ہیں!");
+        function nextStep() {
+            currentDialogue = "اگلا مرحلہ: اب اس پر شہد ڈالیں!";
+            document.getElementById("voiceText").innerText = currentDialogue;
+            speak("اگلا مرحلہ شروع کرتے ہیں!");
         }
 
-        function resetGame() {
-            currentScore = 0;
-            document.getElementById("score").innerText = "اسکور: 0";
-            document.getElementById("bowlIcon").innerText = "🥣";
-            document.getElementById("instructionText").innerText = "السَّلَامُ عَلَيْكُمْ دوستو! نئی ریسیپی شروع کرتے ہیں، مَا شَاءَ اللّٰه!";
-            playVoice("السَّلَامُ عَلَيْكُمْ دوستو! نئی ریسیپی شروع کرتے ہیں، مَا شَاءَ اللّٰه!", true);
+        function resetKitchen() {
+            score = 0;
+            activeItem = null;
+            document.getElementById("scoreDisplay").innerText = "اسکور: 0";
+            document.getElementById("bowlEmoji").innerText = "🥣";
+            currentDialogue = "السَّلَامُ عَلَيْكُمْ دوستو! نئی ریسیپی شروع کرتے ہیں، مَا شَاءَ اللّٰه!";
+            document.getElementById("voiceText").innerText = currentDialogue;
+            speak(currentDialogue, true);
         }
 
-        // پیج لوڈ ہوتے ہی عربی ایکسنٹ میں سلام
+        // پیج کھلتے ہی گیم کا آغاز اور سلام
         window.onload = () => {
             setTimeout(() => {
-                playVoice("السَّلَامُ عَلَيْكُمْ دوستو! آج ہمارے کچن میں مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!", true);
-            }, 800);
+                speak("السَّلَامُ عَلَيْكُمْ دوستو! آج مزیدار پین کیک بنے گا، مَا شَاءَ اللّٰه!", true);
+            }, 1000);
         };
     </script>
 </body>
